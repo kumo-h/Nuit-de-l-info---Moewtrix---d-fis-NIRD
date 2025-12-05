@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jeu Découverte - NIRD</title>
     
-    
-
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
@@ -27,14 +25,13 @@
     body {
         margin: 0;
         padding: 0;
-        /* Utilisation des variables rétro */
         background: linear-gradient(180deg, rgba(0, 0, 0, 0.32), transparent), var(--bg);
         color: var(--neon-cyan);
         font-family: 'Press Start 2P', monospace, system-ui;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         letter-spacing: 0.02em;
-        overflow: hidden;
+        overflow: hidden; /* Conserver l'overflow: hidden pour le jeu plein écran */
         user-select: none;
     }
 
@@ -58,6 +55,7 @@
     }
 
     .logo-link img { height: 50px; width: auto; vertical-align: middle; filter: drop-shadow(0 0 5px var(--neon-cyan)); }
+    .menu-links { display: flex; gap: 10px; }
     .nav-item { 
         text-decoration: none; 
         color: var(--neon-cyan); 
@@ -89,23 +87,25 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        min-height: calc(100vh - 76px); /* Hauteur ajustée en fonction du header */
+        min-height: calc(100vh - 76px); 
         padding: 20px;
-        background: transparent; /* Laisse le body gérer le background */
+        background: transparent; 
     }
 
     #game-window {
+        /* Valeurs de base pour un grand écran */
         width: 900px;
         height: 600px;
         background-color: #000;
         position: relative;
-        /* Style CRT/Retro */
         border: 6px solid var(--neon-cyan);
         border-radius: 8px;
         box-shadow:
             0 0 24px rgba(0, 255, 255, 0.2),
             inset 0 0 10px rgba(0, 255, 255, 0.1);
         overflow: hidden;
+        /* Ajout de la transition pour le redimensionnement fluide sur les media queries */
+        transition: width 0.3s, height 0.3s;
     }
 
     /* Scanlines pour la fenêtre de jeu (effet CRT) */
@@ -139,7 +139,7 @@
         align-items: center;
         z-index: 10;
         color: var(--neon-cyan);
-        background-color: rgba(7, 16, 41, 0.95); /* Fond légèrement transparent pour l'effet */
+        background-color: rgba(7, 16, 41, 0.95);
     }
 
     .slide.active {
@@ -161,6 +161,7 @@
         border: 3px solid var(--neon-cyan);
         box-shadow: 0 0 15px rgba(110, 255, 255, 0.3); 
         width: 50%;
+        max-width: 400px; /* Ajout d'une max-width pour le responsive */
     }
     h2 { 
         color: var(--neon-pink); 
@@ -177,33 +178,36 @@
         font-size: 0.8em; 
         box-sizing: border-box; 
         background-color: var(--panel);
-        color: var(--neon-pink);
+        color: var(--neon-cyan); /* Texte en Cyan pour l'input */
         font-family: monospace;
     }
     input:focus { outline: 2px solid var(--neon-yellow); }
     label { color: var(--muted); font-size: 0.7em; }
     
+    /* Bouton de validation (Harmonisé en Néon Rose) */
     .btn-next { 
-        background-color: var(--neon-green); 
+        background-color: var(--neon-pink); /* Rose */
         color: var(--bg); 
-        border: 3px solid var(--neon-green);
+        border: 3px solid var(--neon-pink);
         padding: 12px 25px; 
         font-size: 0.8em; 
         cursor: pointer; 
         border-radius: 3px; 
         transition: all 0.1s;
-        box-shadow: 0 0 10px rgba(255, 28, 179, 0.5);
+        box-shadow: 0 0 10px rgba(255, 62, 196, 0.5); /* Ombre rose */
         font-family: 'Press Start 2P', monospace;
     }
     .btn-next:hover { transform: scale(1.05); }
 
+    /* MODIFICATION ICI : Suppression des filtres pour avoir l'image en couleur/normale */
     #slide-school {
-        background-image: url(bat1.svg); /* Laissez l'image d'arrière-plan de l'école */
+        background-image: url(bat1.svg); 
         background-size: cover; 
         background-position: center; 
         position: relative;
-        filter: grayscale(80%) brightness(0.6); /* Assombrissement pour le look rétro */
+        /* RÉTIRÉ: filter: grayscale(80%) brightness(0.6); */
     }
+
     .school-sign-container {
         position: absolute; top: 20%; 
         background-color: var(--neon-yellow); 
@@ -221,6 +225,7 @@
         color: var(--bg); 
         text-transform: uppercase; 
     }
+    /* Instruction d'entrée (Cyan, Cliquable) */
     .overlay-instruction { 
         position: absolute; bottom: 20px; 
         background: rgba(0,255,255,0.1); 
@@ -233,13 +238,15 @@
         font-size: 0.8em;
     }
 
+    /* MODIFICATION ICI : Suppression des filtres pour avoir l'image en couleur/normale */
     #slide-dialogue {
-        background-image: url(bat.svg); /* Laissez l'image de fond */
+        background-image: url(bat.svg); 
         background-size: cover; 
         background-position: center; 
         image-rendering: pixelated;
-        filter: grayscale(80%) brightness(0.6); /* Assombrissement pour le look rétro */
+        /* RÉTIRÉ: filter: grayscale(80%) brightness(0.6); */
     }
+
     .character { 
         position: absolute; 
         bottom: 70px; 
@@ -249,12 +256,14 @@
         line-height: 350px; 
         text-align: center;
         width: 200px;
-        filter: drop-shadow(0 0 10px rgba(255, 62, 196, 0.5)); /* Ombre néon rose pour les emojis */
+        filter: drop-shadow(0 0 10px rgba(255, 62, 196, 0.5)); 
     }
+    .char-left { left: 5%; }
+    .char-right { right: 5%; }
     .dialogue-box {
         position: absolute; bottom: 20px; left: 20px; right: 20px; height: 140px;
         background-color: rgba(0, 0, 0, 0.85); 
-        border: 4px solid var(--neon-pink); /* Bordure néon rose */
+        border: 4px solid var(--neon-pink); 
         border-radius: 4px; 
         padding: 20px;
         color: var(--neon-cyan); 
@@ -264,7 +273,7 @@
     }
     .speaker-name { color: var(--neon-yellow); font-weight: bold; margin-bottom: 10px; font-size: 0.9em; text-transform: uppercase;}
     .dialogue-text { font-size: 1em; line-height: 1.4; color: var(--neon-green); }
-    .next-arrow { align-self: flex-end; font-size: 1.5em; margin-top: auto; animation: bounce 1s infinite; color: var(--neon-pink);}
+    .next-arrow { align-self: flex-end; font-size: 1.5em; margin-top: auto; animation: bounce 1s infinite; color: var(--neon-pink);} /* Rose clignotant */
 
     #slide-narrative { 
         background-color: var(--bg); 
@@ -281,8 +290,9 @@
     .highlight-school { color: var(--neon-yellow); text-shadow: 0 0 5px var(--neon-yellow);}
     .click-to-continue { 
         font-size: 0.7em; margin-top: 50px; opacity: 0.8; 
+        color: var(--neon-cyan); /* Cyan pour le clic */
         animation: pulse 2s infinite; 
-        color: var(--muted);
+        cursor: pointer;
     }
 
     #slide-mission {
@@ -297,7 +307,7 @@
     }
     .mission-content p { 
         font-family: monospace;
-        color: var(--neon-pink);
+        color: var(--neon-cyan); /* Texte mission en Cyan */
         font-size: 0.9em !important; 
     }
     .mission-content strong { color: var(--neon-pink); }
@@ -326,81 +336,47 @@
         display: none;
         position: absolute; top: 0; left: 0; width: 100%; height: 100%;
         background-color: var(--bg);
-        /* Ajout de scanlines et grain à l'interface de jeu pour l'immersion */
     }
-
-    canvas {
-        /* Fond de canvas sombre inspiré du premier CSS */
-        background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.25));
-        display: block;
-        width: 100%;
-        height: 100%;
-    }
-
-    /* --- HUD RÉTRO --- */
+    
     #game-hud {
         position: absolute; top: 10px; left: 10px; right: 10px;
-        display: flex; justify-content: space-between; gap: 10px;
-        pointer-events: none;
+        display: flex; justify-content: space-around;
+        gap: 20px;
+        padding: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        border: 2px solid var(--neon-cyan);
+        border-radius: 5px;
     }
-
     .gauge-container {
-        flex: 1;
-        background: rgba(0, 0, 0, 0.7);
-        padding: 8px;
-        border-radius: 4px;
-        border: 3px solid var(--neon-cyan);
-        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        flex-grow: 1;
+        text-align: center;
+        padding: 0 10px;
     }
-
     .gauge-label {
-        color: var(--neon-yellow); 
-        font-weight: bold; 
-        font-size: 0.6em; 
-        margin-bottom: 5px; 
-        text-transform: uppercase; 
-        letter-spacing: 1px;
-        text-shadow: 0 0 3px var(--neon-yellow);
+        font-size: 0.7em;
+        margin-bottom: 5px;
+        color: var(--muted);
     }
-
     .gauge-track {
-        width: 100%; height: 15px; 
-        background-color: #555; 
-        border-radius: 8px; 
-        overflow: hidden; 
-        border: 2px solid rgba(255,255,255,0.2);
-        box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+        height: 15px;
+        background-color: var(--panel);
+        border: 1px solid var(--neon-cyan);
+        border-radius: 3px;
+        overflow: hidden;
     }
-
     .gauge-fill {
-        height: 100%; width: 50%;
-        transition: width 0.2s;
-        /* Ajout d'un effet scanline sur la barre de remplissage */
-        background-image: linear-gradient(
-            45deg, 
-            rgba(255, 255, 255, 0.2) 25%, 
-            transparent 25%, 
-            transparent 50%, 
-            rgba(255, 255, 255, 0.2) 50%, 
-            rgba(255, 255, 255, 0.2) 75%, 
-            transparent 75%, 
-            transparent
-        );
-        background-size: 8px 8px;
+        height: 100%;
+        transition: width 0.3s;
     }
+    #bar-ethique { background-color: var(--neon-pink); }
+    #bar-autonomie { background-color: var(--neon-cyan); }
+    #bar-durabilite { background-color: var(--neon-green); }
 
-    /* Couleurs des barres, utilisant les couleurs néon pour l'impact */
-    #bar-ethique { background-color: var(--neon-pink); } /* Rose pour l'éthique */
-    #bar-autonomie { background-color: var(--neon-cyan); } /* Cyan pour l'autonomie */
-    #bar-durabilite { background-color: var(--neon-green); } /* Vert pour la durabilité */
 
-    /* ECRANS FIN */
+    /* ECRANS FIN (Boutons harmonisés) */
     #game-over-screen, #game-win-screen {
         display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(7, 16, 41, 0.95); /* Utilise le BG du jeu pour le fond */
+        background: rgba(7, 16, 41, 0.95);
         flex-direction: column; justify-content: center; align-items: center;
         color: var(--neon-cyan); text-align: center; z-index: 20;
     }
@@ -419,23 +395,89 @@
         font-size: 1em; margin-bottom: 30px; line-height: 1.5; max-width: 600px;
         font-family: monospace;
     }
+
+    /* Bouton Réessayer/Retour (Néon Cyan/Rose) */
     .restart-btn { 
-        background-color: var(--neon-cyan); 
+        background-color: var(--neon-pink); /* Utilisation du Rose pour le contraste */
         color: var(--bg); 
         padding: 15px 30px; 
-        border: 4px solid var(--neon-cyan); 
+        border: 4px solid var(--neon-pink); 
         font-size: 1em; 
         cursor: pointer; 
         border-radius: 4px;
         font-family: 'Press Start 2P', monospace;
-        box-shadow: 0 0 10px var(--neon-cyan);
+        box-shadow: 0 0 10px var(--neon-pink);
     }
-    .restart-btn:hover { background-color: var(--neon-cyan); }
+    .restart-btn:hover { background-color: var(--neon-cyan); border-color: var(--neon-cyan); box-shadow: 0 0 10px var(--neon-cyan); } /* Hover en Cyan */
 
     #controls-hint {
         position: absolute; bottom: 10px; width: 100%; text-align: center;
         color: var(--muted); font-size: 0.8em; pointer-events: none;
         font-family: monospace;
+    }
+    
+    /* --- MEDIA QUERIES (Responsive Design) --- */
+
+    /* Petits écrans (Smartphones, max 768px) */
+    @media (max-width: 768px) {
+        /* Redimensionnement de la fenêtre de jeu principale pour s'adapter à l'écran */
+        main {
+            padding: 10px;
+            min-height: calc(100vh - 66px); /* Ajuster la hauteur */
+        }
+
+        #game-window {
+            width: 95vw; /* Occupe 95% de la largeur de la vue */
+            height: calc(95vw * (600 / 900)); /* Ratio 900:600 maintenu */
+            max-width: 900px; /* Limiter la taille max */
+        }
+
+        /* Header / Navigation */
+        nav {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 5px 10px;
+        }
+        .logo-link img { height: 40px; }
+        .menu-links { 
+            width: 100%;
+            justify-content: space-around;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .nav-item { font-size: 7px; padding: 5px 8px; }
+
+        /* Slides (Intro/Brief) */
+        .form-container, .mission-content {
+            width: 80%;
+            padding: 20px;
+        }
+        h2 { font-size: 0.8em; }
+        .btn-next, .btn-mission { font-size: 0.7em; padding: 10px 20px; }
+        .narrative-text { font-size: 0.9em; padding: 0 10px;}
+
+        /* Dialogue box */
+        .character { font-size: 100px; bottom: 50px; height: 250px; }
+        .dialogue-box { height: 100px; padding: 10px; bottom: 10px; left: 10px; right: 10px; }
+        .dialogue-text { font-size: 0.8em; }
+        .speaker-name { font-size: 0.7em; }
+        .overlay-instruction { font-size: 0.7em; padding: 8px 15px; bottom: 10px; }
+        
+        /* HUD */
+        #game-hud {
+            flex-direction: column; /* Empiler les jauges verticalement */
+            top: 5px; left: 5px; right: 5px;
+            gap: 5px;
+        }
+        .gauge-container { padding: 5px; }
+        .gauge-label { font-size: 0.5em; }
+        .gauge-track { height: 10px; }
+
+        /* Ecrans de fin */
+        .game-over-title, .game-win-title { font-size: 2em; }
+        .score-final { font-size: 0.8em; }
+        .restart-btn { font-size: 0.8em; padding: 10px 20px; }
+        #controls-hint { font-size: 0.6em; }
     }
     
 </style>
@@ -458,9 +500,6 @@
     <main>
         <div id="game-window">
             
-            <!-- --- PARTIE 1 : DIAPORAMA INTERACTIF --- -->
-
-            <!-- SLIDE 1 : FORMULAIRE -->
             <div id="slide-intro" class="slide active">
                 <div class="form-container">
                     <h2>Configuration de la mission</h2>
@@ -473,7 +512,6 @@
                 </div>
             </div>
 
-            <!-- SLIDE 2 : ECOLE -->
             <div id="slide-school" class="slide">
                 <div class="school-sign-container">
                     <span id="display-school-name" class="school-sign-text">LYCEE ???</span>
@@ -483,11 +521,8 @@
                 </div>
             </div>
 
-            <!-- SLIDE 3 : DIALOGUE -->
             <div id="slide-dialogue" class="slide">
-                <!-- M. Le Proviseur (Gauche) : Professeur Homme 🧑‍🏫 -->
                 <span alt="Proviseur" class="character char-left">🧑‍🏫</span>
-                <!-- Joueur (Droite) : Professeur Femme 👩‍🏫 -->
                 <span alt="Joueur" class="character char-right">👩‍🏫</span>
                 <div class="dialogue-box" onclick="nextDialogueLine()">
                     <div class="speaker-name" id="speaker-name">...</div>
@@ -496,7 +531,6 @@
                 </div>
             </div>
 
-            <!-- SLIDE 4 : NARRATIVE -->
             <div id="slide-narrative" class="slide" onclick="goToMission()">
                 <div class="narrative-text">
                     <p>Vous, <span id="narrative-player-name" class="highlight">JOUEUR</span>, partez donc en mission pour sauver le <span id="narrative-school-name" class="highlight-school">ETABLISSEMENT</span>...</p>
@@ -505,44 +539,37 @@
                 <div class="click-to-continue">(Cliquez pour continuer)</div>
             </div>
 
-            <!-- SLIDE 5 : MISSION BRIEF -->
             <div id="slide-mission" class="slide">
                 <div class="mission-content">
                     <h2>OBJECTIFS DE MISSION</h2>
                     <p style="font-size: 1.1em; max-width:700px; margin: 0 auto 30px auto; text-align: left;">
                         Vous devez remplir les 3 jauges à <strong>100%</strong> pour gagner. <br>
-                        Attention : Si <strong>une seule</strong> jauge tombe à 0%, c'est perdu !<br><br>
-                        🟣 <strong>ÉTHIQUE :</strong> Attrapez les Logiciels Libres 🔓, évitez les Clouds ☁️.<br>
-                        🔵 <strong>AUTONOMIE :</strong> Attrapez Linux 🐧, évitez les GAFAM 💰.<br>
-                        🟢 <strong>DURABILITÉ :</strong> Attrapez les PC Réparés 💻, évitez les PC Poubelles 🗑️.
+                        Attention : Si **une seule** jauge tombe à 0%, c'est perdu !<br><br>
+                        🟣 **ÉTHIQUE :** Attrapez les Logiciels Libres 🔓, évitez les Clouds ☁️.<br>
+                        🔵 **AUTONOMIE :** Attrapez Linux 🐧, évitez les GAFAM 💰.<br>
+                        🟢 **DURABILITÉ :** Attrapez les PC Réparés 💻, évitez les PC Poubelles 🗑️.
                     </p>
                     <button class="btn-mission" onclick="launchGame()">PARTIR EN MISSION 🚀</button>
                 </div>
             </div>
 
 
-            <!-- --- PARTIE 2 : LE JEU (CANVAS + JAUGES) --- -->
-            
             <div id="game-interface">
                 <canvas id="gameCanvas" width="900" height="600"></canvas>
                 
-                <!-- HUD JAUGES -->
                 <div id="game-hud">
-                    <!-- Jauge 1 : Ethique -->
                     <div class="gauge-container">
                         <div class="gauge-label">Éthique 🟣</div>
                         <div class="gauge-track">
                             <div id="bar-ethique" class="gauge-fill" style="width: 50%;"></div>
                         </div>
                     </div>
-                    <!-- Jauge 2 : Autonomie -->
                     <div class="gauge-container">
                         <div class="gauge-label">Autonomie 🔵</div>
                         <div class="gauge-track">
                             <div id="bar-autonomie" class="gauge-fill" style="width: 50%;"></div>
                         </div>
                     </div>
-                    <!-- Jauge 3 : Durabilité -->
                     <div class="gauge-container">
                         <div class="gauge-label">Durabilité 🟢</div>
                         <div class="gauge-track">
@@ -553,14 +580,12 @@
 
                 <div id="controls-hint">⬅️ Utilisez les flèches Gauche/Droite pour bouger ➡️</div>
 
-                <!-- Ecran Game Over -->
                 <div id="game-over-screen">
                     <div class="game-over-title">ÉCHEC CRITIQUE</div>
                     <div class="score-final" id="lose-reason">...</div>
                     <button class="restart-btn" onclick="resetGame()">Réessayer la mission</button>
                 </div>
 
-                <!-- Ecran Victoire -->
                 <div id="game-win-screen">
                     <div class="game-win-title">MISSION ACCOMPLIE !</div>
                     <div class="score-final">
@@ -624,6 +649,24 @@
         // --- LOGIQUE JEU (BARRES + CANVAS) ---
 
         const canvas = document.getElementById('gameCanvas');
+        // Initialiser la taille du canvas en fonction de la taille actuelle de la fenêtre de jeu
+        function resizeCanvas() {
+            const gameWindow = document.getElementById('game-window');
+            canvas.width = gameWindow.clientWidth;
+            canvas.height = gameWindow.clientHeight;
+            // Repositionner le joueur
+            if (player) {
+                 player.x = canvas.width / 2 - player.width / 2; 
+                 // Mettre à jour player.y aussi
+                 player.y = canvas.height - 100 - player.height;
+            }
+        }
+
+        // Appeler au chargement et au redimensionnement
+        window.addEventListener('load', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas);
+
+
         const ctx = canvas.getContext('2d');
         let gameRunning = false;
         let animationId;
@@ -675,6 +718,7 @@
         function launchGame() {
             document.getElementById('slide-mission').classList.remove('active');
             document.getElementById('game-interface').style.display = 'block';
+            resizeCanvas(); // Assurer le bon redimensionnement avant le jeu
             resetGame();
         }
 
@@ -727,8 +771,13 @@
             player.x += player.dx;
             if (player.x < 0) player.x = 0;
             if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+            
+            // Le "50px" est le déplacement nécessaire car le texte est dessiné à partir du coin inférieur gauche
+            const playerY = canvas.height - 100; 
+            player.y = playerY - player.height;
+
             ctx.font = "40px Arial";
-            ctx.fillText(player.emoji, player.x, player.y + 40);
+            ctx.fillText(player.emoji, player.x, playerY);
 
             // Objets
             frameCount++;
