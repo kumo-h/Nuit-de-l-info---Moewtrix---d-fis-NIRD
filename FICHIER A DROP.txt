@@ -1,0 +1,9 @@
+Ci joint notre site de présentation du projet NIRD. 
+
+Ce site est composé de trois pages. Un page d'accueille, une page de présentation du projet NIRD, et une page de mini jeu pour sensibiliser à l'engagement au sein du projet.
+
+LE LIEN DE LA PAGE WEB
+https://kumo-h.github.io/Nuit-de-l-info---Moewtrix---d-fis-NIRD/
+
+LE LIEN DU GITHUB
+https://github.com/kumo-h/Nuit-de-l-info---Moewtrix---d-fis-NIRD/settings/pages
