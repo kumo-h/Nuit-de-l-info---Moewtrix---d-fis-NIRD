@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jeu Découverte - NIRD</title>
+    
+    
+
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+    /* --- VARIABLES RETRO (Inspirées du premier CSS) --- */
+    :root {
+        --gap: 14px;
+        --bg: #071029; /* deep navy */
+        --panel: #081826;
+        --neon-cyan: #00f0ff;
+        --neon-pink: #ff3ec4;
+        --neon-green: #4cff7a;
+        --neon-yellow: #ffd84d;
+        --muted: #9aa8b8;
+        --scanline: rgba(255, 255, 255, 0.02);
+    }
+
+    /* --- STYLE GENERAL --- */
+    body {
+        margin: 0;
+        padding: 0;
+        /* Utilisation des variables rétro */
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.32), transparent), var(--bg);
+        color: var(--neon-cyan);
+        font-family: 'Press Start 2P', monospace, system-ui;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        letter-spacing: 0.02em;
+        overflow: hidden;
+        user-select: none;
+    }
+
+    /* --- HEADER (Adaptation au style sombre/néon) --- */
+    header {
+        background-color: var(--panel);
+        box-shadow: 0 0 12px rgba(0, 255, 255, 0.1);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        border-bottom: 3px solid var(--neon-cyan);
+    }
+
+    nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .logo-link img { height: 50px; width: auto; vertical-align: middle; filter: drop-shadow(0 0 5px var(--neon-cyan)); }
+    .nav-item { 
+        text-decoration: none; 
+        color: var(--neon-cyan); 
+        font-weight: 500; 
+        padding: 8px 15px; 
+        border-radius: 4px; 
+        transition: all 0.2s ease;
+        font-size: 10px; /* Taille plus petite pour la police rétro */
+    }
+    .nav-item:hover, .nav-item.active { 
+        background-color: rgba(0, 255, 255, 0.1); 
+        color: var(--neon-yellow);
+        text-shadow: 0 0 5px var(--neon-yellow);
+        border: 1px solid var(--neon-yellow);
+    }
+    .btn-game { 
+        background-color: var(--neon-pink); 
+        color: var(--bg);
+        border: 3px solid var(--neon-pink);
+        text-shadow: none;
+        box-shadow: 0 0 8px var(--neon-pink);
+    }
+    .btn-game:hover {
+        background-color: var(--neon-pink); 
+    }
+
+    /* --- ZONE DE JEU (Écran CRT) --- */
+    main {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 76px); /* Hauteur ajustée en fonction du header */
+        padding: 20px;
+        background: transparent; /* Laisse le body gérer le background */
+    }
+
+    #game-window {
+        width: 900px;
+        height: 600px;
+        background-color: #000;
+        position: relative;
+        /* Style CRT/Retro */
+        border: 6px solid var(--neon-cyan);
+        border-radius: 8px;
+        box-shadow:
+            0 0 24px rgba(0, 255, 255, 0.2),
+            inset 0 0 10px rgba(0, 255, 255, 0.1);
+        overflow: hidden;
+    }
+
+    /* Scanlines pour la fenêtre de jeu (effet CRT) */
+    #game-window::after {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        background-image: repeating-linear-gradient(
+            to bottom,
+            var(--scanline) 0px,
+            var(--scanline) 1px,
+            transparent 1px,
+            transparent 3px
+        );
+        mix-blend-mode: overlay;
+        opacity: 0.5;
+        z-index: 99;
+    }
+
+    /* --- SLIDES (INTRO) --- */
+    .slide {
+        display: none;
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        color: var(--neon-cyan);
+        background-color: rgba(7, 16, 41, 0.95); /* Fond légèrement transparent pour l'effet */
+    }
+
+    .slide.active {
+        display: flex;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    /* Styles spécifiques aux slides */
+    #slide-intro { 
+        text-align: center; 
+        background-color: var(--panel);
+    }
+    .form-container { 
+        background: var(--bg); 
+        padding: 40px; 
+        border-radius: 8px; 
+        border: 3px solid var(--neon-cyan);
+        box-shadow: 0 0 15px rgba(110, 255, 255, 0.3); 
+        width: 50%;
+    }
+    h2 { 
+        color: var(--neon-pink); 
+        text-shadow: 0 0 5px var(--neon-pink);
+        font-size: 1em; 
+        margin-bottom: 20px;
+    }
+    input { 
+        width: 100%; 
+        padding: 10px; 
+        margin: 10px 0 20px 0; 
+        border: 2px solid var(--muted); 
+        border-radius: 3px; 
+        font-size: 0.8em; 
+        box-sizing: border-box; 
+        background-color: var(--panel);
+        color: var(--neon-pink);
+        font-family: monospace;
+    }
+    input:focus { outline: 2px solid var(--neon-yellow); }
+    label { color: var(--muted); font-size: 0.7em; }
+    
+    .btn-next { 
+        background-color: var(--neon-green); 
+        color: var(--bg); 
+        border: 3px solid var(--neon-green);
+        padding: 12px 25px; 
+        font-size: 0.8em; 
+        cursor: pointer; 
+        border-radius: 3px; 
+        transition: all 0.1s;
+        box-shadow: 0 0 10px rgba(255, 28, 179, 0.5);
+        font-family: 'Press Start 2P', monospace;
+    }
+    .btn-next:hover { transform: scale(1.05); }
+
+    #slide-school {
+        background-image: url(bat1.svg); /* Laissez l'image d'arrière-plan de l'école */
+        background-size: cover; 
+        background-position: center; 
+        position: relative;
+        filter: grayscale(80%) brightness(0.6); /* Assombrissement pour le look rétro */
+    }
+    .school-sign-container {
+        position: absolute; top: 20%; 
+        background-color: var(--neon-yellow); 
+        border: 3px solid var(--neon-pink); 
+        padding: 10px 30px; 
+        border-radius: 5px; 
+        box-shadow: 0 0 15px var(--neon-yellow), inset 0 0 5px var(--neon-pink); 
+        transform: rotate(-2deg);
+        filter: none;
+    }
+    .school-sign-text { 
+        font-family: 'Press Start 2P', monospace; 
+        font-weight: bold; 
+        font-size: 1em; 
+        color: var(--bg); 
+        text-transform: uppercase; 
+    }
+    .overlay-instruction { 
+        position: absolute; bottom: 20px; 
+        background: rgba(0,255,255,0.1); 
+        color: var(--neon-cyan); 
+        padding: 10px 20px; 
+        border-radius: 3px; 
+        border: 2px solid var(--neon-cyan);
+        cursor: pointer; 
+        animation: pulse 2s infinite;
+        font-size: 0.8em;
+    }
+
+    #slide-dialogue {
+        background-image: url(bat.svg); /* Laissez l'image de fond */
+        background-size: cover; 
+        background-position: center; 
+        image-rendering: pixelated;
+        filter: grayscale(80%) brightness(0.6); /* Assombrissement pour le look rétro */
+    }
+    .character { 
+        position: absolute; 
+        bottom: 70px; 
+        height: 350px; 
+        transition: transform 0.3s;
+        font-size: 150px; 
+        line-height: 350px; 
+        text-align: center;
+        width: 200px;
+        filter: drop-shadow(0 0 10px rgba(255, 62, 196, 0.5)); /* Ombre néon rose pour les emojis */
+    }
+    .dialogue-box {
+        position: absolute; bottom: 20px; left: 20px; right: 20px; height: 140px;
+        background-color: rgba(0, 0, 0, 0.85); 
+        border: 4px solid var(--neon-pink); /* Bordure néon rose */
+        border-radius: 4px; 
+        padding: 20px;
+        color: var(--neon-cyan); 
+        font-family: monospace; 
+        display: flex; flex-direction: column; cursor: pointer;
+        box-shadow: 0 0 15px rgba(255, 62, 196, 0.4);
+    }
+    .speaker-name { color: var(--neon-yellow); font-weight: bold; margin-bottom: 10px; font-size: 0.9em; text-transform: uppercase;}
+    .dialogue-text { font-size: 1em; line-height: 1.4; color: var(--neon-green); }
+    .next-arrow { align-self: flex-end; font-size: 1.5em; margin-top: auto; animation: bounce 1s infinite; color: var(--neon-pink);}
+
+    #slide-narrative { 
+        background-color: var(--bg); 
+        color: var(--neon-cyan); 
+        text-align: center; padding: 40px; box-sizing: border-box; 
+    }
+    .narrative-text { 
+        font-size: 1.2em; 
+        line-height: 1.6; 
+        font-family: 'Press Start 2P', monospace; 
+        max-width: 700px; 
+    }
+    .highlight { color: var(--neon-pink); text-shadow: 0 0 5px var(--neon-pink);}
+    .highlight-school { color: var(--neon-yellow); text-shadow: 0 0 5px var(--neon-yellow);}
+    .click-to-continue { 
+        font-size: 0.7em; margin-top: 50px; opacity: 0.8; 
+        animation: pulse 2s infinite; 
+        color: var(--muted);
+    }
+
+    #slide-mission {
+        background-color: var(--bg); 
+        color: var(--neon-pink); 
+        text-align: center;
+        background-image: radial-gradient(circle at center, var(--panel) 0%, var(--bg) 100%);
+    }
+    .mission-content h2 { 
+        font-size: 2em; margin-bottom: 20px; color: var(--neon-pink); 
+        text-transform: uppercase; letter-spacing: 3px; 
+    }
+    .mission-content p { 
+        font-family: monospace;
+        color: var(--neon-pink);
+        font-size: 0.9em !important; 
+    }
+    .mission-content strong { color: var(--neon-pink); }
+    
+    .btn-mission {
+        background-color: var(--neon-pink); 
+        color: var(--bg); 
+        font-size: 1.2em; 
+        padding: 15px 40px; 
+        border: 4px solid var(--neon-pink); 
+        border-radius: 4px;
+        cursor: pointer; 
+        box-shadow: 0 0 15px var(--neon-pink); 
+        transition: all 0.1s; 
+        text-transform: uppercase; 
+        font-weight: bold;
+        font-family: 'Press Start 2P', monospace;
+    }
+    .btn-mission:hover { transform: translateY(-2px); box-shadow: 0 4px 0 var(--neon-pink), 0 0 20px var(--neon-pink); }
+    
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+    @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+
+    /* --- JEU CANVAS (ACTION) --- */
+    #game-interface {
+        display: none;
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: var(--bg);
+        /* Ajout de scanlines et grain à l'interface de jeu pour l'immersion */
+    }
+
+    canvas {
+        /* Fond de canvas sombre inspiré du premier CSS */
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.25));
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    /* --- HUD RÉTRO --- */
+    #game-hud {
+        position: absolute; top: 10px; left: 10px; right: 10px;
+        display: flex; justify-content: space-between; gap: 10px;
+        pointer-events: none;
+    }
+
+    .gauge-container {
+        flex: 1;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 8px;
+        border-radius: 4px;
+        border: 3px solid var(--neon-cyan);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .gauge-label {
+        color: var(--neon-yellow); 
+        font-weight: bold; 
+        font-size: 0.6em; 
+        margin-bottom: 5px; 
+        text-transform: uppercase; 
+        letter-spacing: 1px;
+        text-shadow: 0 0 3px var(--neon-yellow);
+    }
+
+    .gauge-track {
+        width: 100%; height: 15px; 
+        background-color: #555; 
+        border-radius: 8px; 
+        overflow: hidden; 
+        border: 2px solid rgba(255,255,255,0.2);
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+    }
+
+    .gauge-fill {
+        height: 100%; width: 50%;
+        transition: width 0.2s;
+        /* Ajout d'un effet scanline sur la barre de remplissage */
+        background-image: linear-gradient(
+            45deg, 
+            rgba(255, 255, 255, 0.2) 25%, 
+            transparent 25%, 
+            transparent 50%, 
+            rgba(255, 255, 255, 0.2) 50%, 
+            rgba(255, 255, 255, 0.2) 75%, 
+            transparent 75%, 
+            transparent
+        );
+        background-size: 8px 8px;
+    }
+
+    /* Couleurs des barres, utilisant les couleurs néon pour l'impact */
+    #bar-ethique { background-color: var(--neon-pink); } /* Rose pour l'éthique */
+    #bar-autonomie { background-color: var(--neon-cyan); } /* Cyan pour l'autonomie */
+    #bar-durabilite { background-color: var(--neon-green); } /* Vert pour la durabilité */
+
+    /* ECRANS FIN */
+    #game-over-screen, #game-win-screen {
+        display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(7, 16, 41, 0.95); /* Utilise le BG du jeu pour le fond */
+        flex-direction: column; justify-content: center; align-items: center;
+        color: var(--neon-cyan); text-align: center; z-index: 20;
+    }
+    
+    .game-over-title { 
+        color: var(--neon-pink); font-size: 3em; font-weight: bold; 
+        text-transform: uppercase; margin-bottom: 20px; 
+        text-shadow: 0 0 10px var(--neon-pink);
+    }
+    .game-win-title { 
+        color: var(--neon-green); font-size: 3em; font-weight: bold; 
+        text-transform: uppercase; margin-bottom: 20px; 
+        text-shadow: 0 0 10px var(--neon-green);
+    }
+    .score-final { 
+        font-size: 1em; margin-bottom: 30px; line-height: 1.5; max-width: 600px;
+        font-family: monospace;
+    }
+    .restart-btn { 
+        background-color: var(--neon-cyan); 
+        color: var(--bg); 
+        padding: 15px 30px; 
+        border: 4px solid var(--neon-cyan); 
+        font-size: 1em; 
+        cursor: pointer; 
+        border-radius: 4px;
+        font-family: 'Press Start 2P', monospace;
+        box-shadow: 0 0 10px var(--neon-cyan);
+    }
+    .restart-btn:hover { background-color: var(--neon-cyan); }
+
+    #controls-hint {
+        position: absolute; bottom: 10px; width: 100%; text-align: center;
+        color: var(--muted); font-size: 0.8em; pointer-events: none;
+        font-family: monospace;
+    }
+    
+</style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="https://site-officiel-nird.com" class="logo-link" target="_blank">
+                <img src="https://via.placeholder.com/150x50?text=LOGO+NIRD" alt="Logo NIRD">
+            </a>
+            <div class="menu-links">
+                <a href="index.html" class="nav-item">Accueil</a>
+                <a href="ressources.html" class="nav-item">Découvrir les ressources</a>
+                <a href="jeu.html" class="nav-item active btn-game">Jeu découverte 🎮</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div id="game-window">
+            
+            <!-- --- PARTIE 1 : DIAPORAMA INTERACTIF --- -->
+
+            <!-- SLIDE 1 : FORMULAIRE -->
+            <div id="slide-intro" class="slide active">
+                <div class="form-container">
+                    <h2>Configuration de la mission</h2>
+                    <p>Bienvenue. Veuillez vous identifier pour accéder au dossier.</p>
+                    <label for="player-name" style="display:block; text-align:left; font-weight:bold;">Votre Nom :</label>
+                    <input type="text" id="player-name" placeholder="Ex: Alex">
+                    <label for="school-name" style="display:block; text-align:left; font-weight:bold;">Nom de l'établissement :</label>
+                    <input type="text" id="school-name" placeholder="Ex: Lycée Jean Moulin">
+                    <button class="btn-next" onclick="goToSchool()">VALIDER</button>
+                </div>
+            </div>
+
+            <!-- SLIDE 2 : ECOLE -->
+            <div id="slide-school" class="slide">
+                <div class="school-sign-container">
+                    <span id="display-school-name" class="school-sign-text">LYCEE ???</span>
+                </div>
+                <div class="overlay-instruction" onclick="startDialogue()">
+                    Entrer dans le bureau du Proviseur ➤
+                </div>
+            </div>
+
+            <!-- SLIDE 3 : DIALOGUE -->
+            <div id="slide-dialogue" class="slide">
+                <!-- M. Le Proviseur (Gauche) : Professeur Homme 🧑‍🏫 -->
+                <span alt="Proviseur" class="character char-left">🧑‍🏫</span>
+                <!-- Joueur (Droite) : Professeur Femme 👩‍🏫 -->
+                <span alt="Joueur" class="character char-right">👩‍🏫</span>
+                <div class="dialogue-box" onclick="nextDialogueLine()">
+                    <div class="speaker-name" id="speaker-name">...</div>
+                    <div class="dialogue-text" id="dialogue-text">...</div>
+                    <div class="next-arrow">▼</div>
+                </div>
+            </div>
+
+            <!-- SLIDE 4 : NARRATIVE -->
+            <div id="slide-narrative" class="slide" onclick="goToMission()">
+                <div class="narrative-text">
+                    <p>Vous, <span id="narrative-player-name" class="highlight">JOUEUR</span>, partez donc en mission pour sauver le <span id="narrative-school-name" class="highlight-school">ETABLISSEMENT</span>...</p>
+                    <p style="margin-top:30px;">Votre objectif : Reprendre le contrôle sur toute l'informatique utilisée dans votre établissement !!</p>
+                </div>
+                <div class="click-to-continue">(Cliquez pour continuer)</div>
+            </div>
+
+            <!-- SLIDE 5 : MISSION BRIEF -->
+            <div id="slide-mission" class="slide">
+                <div class="mission-content">
+                    <h2>OBJECTIFS DE MISSION</h2>
+                    <p style="font-size: 1.1em; max-width:700px; margin: 0 auto 30px auto; text-align: left;">
+                        Vous devez remplir les 3 jauges à <strong>100%</strong> pour gagner. <br>
+                        Attention : Si <strong>une seule</strong> jauge tombe à 0%, c'est perdu !<br><br>
+                        🟣 <strong>ÉTHIQUE :</strong> Attrapez les Logiciels Libres 🔓, évitez les Clouds ☁️.<br>
+                        🔵 <strong>AUTONOMIE :</strong> Attrapez Linux 🐧, évitez les GAFAM 💰.<br>
+                        🟢 <strong>DURABILITÉ :</strong> Attrapez les PC Réparés 💻, évitez les PC Poubelles 🗑️.
+                    </p>
+                    <button class="btn-mission" onclick="launchGame()">PARTIR EN MISSION 🚀</button>
+                </div>
+            </div>
+
+
+            <!-- --- PARTIE 2 : LE JEU (CANVAS + JAUGES) --- -->
+            
+            <div id="game-interface">
+                <canvas id="gameCanvas" width="900" height="600"></canvas>
+                
+                <!-- HUD JAUGES -->
+                <div id="game-hud">
+                    <!-- Jauge 1 : Ethique -->
+                    <div class="gauge-container">
+                        <div class="gauge-label">Éthique 🟣</div>
+                        <div class="gauge-track">
+                            <div id="bar-ethique" class="gauge-fill" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                    <!-- Jauge 2 : Autonomie -->
+                    <div class="gauge-container">
+                        <div class="gauge-label">Autonomie 🔵</div>
+                        <div class="gauge-track">
+                            <div id="bar-autonomie" class="gauge-fill" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                    <!-- Jauge 3 : Durabilité -->
+                    <div class="gauge-container">
+                        <div class="gauge-label">Durabilité 🟢</div>
+                        <div class="gauge-track">
+                            <div id="bar-durabilite" class="gauge-fill" style="width: 50%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="controls-hint">⬅️ Utilisez les flèches Gauche/Droite pour bouger ➡️</div>
+
+                <!-- Ecran Game Over -->
+                <div id="game-over-screen">
+                    <div class="game-over-title">ÉCHEC CRITIQUE</div>
+                    <div class="score-final" id="lose-reason">...</div>
+                    <button class="restart-btn" onclick="resetGame()">Réessayer la mission</button>
+                </div>
+
+                <!-- Ecran Victoire -->
+                <div id="game-win-screen">
+                    <div class="game-win-title">MISSION ACCOMPLIE !</div>
+                    <div class="score-final">
+                        Bravo ! Votre établissement est désormais :<br>
+                        ✅ Éthique<br>✅ Autonome<br>✅ Durable
+                    </div>
+                    <button class="restart-btn" onclick="location.reload()">Retour Accueil</button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // --- LOGIQUE INTRO (DIAPORAMA) ---
+        let playerData = { name: "Agent", school: "Lycée" };
+        const scenario = [
+            { speaker: "M. le Proviseur", text: "Bonjour {name}. Merci d'être venu aussi vite. La situation numérique de notre établissement devient critique." },
+            { speaker: "Vous", text: "Je vous écoute, Monsieur le Proviseur." },
+            { speaker: "M. le Proviseur", text: "Tout d'abord, nous faisons face à une obsolescence programmée terrible. Nos ordinateurs tombent en panne..." },
+            { speaker: "Vous", text: "Humm..." },
+            { speaker: "M. le Proviseur", text: "De plus, le matériel est fragile, et le coût des licences logicielles ne cesse d'augmenter. Notre budget explose." },
+            { speaker: "Vous", text: "Je vois..." },
+            { speaker: "M. le Proviseur", text: "Le pire, c'est que nos données sont stockées sur des clouds auxquels nous n'avons pas accès..." },
+            { speaker: "Vous", text: "D'accord...." },
+            { speaker: "M. le Proviseur", text: "Nous avons perdu le contrôle de nos outils. Nous sommes dépendants et vulnérables." },
+            { speaker: "Vous", text: "Il y a forcément une solution... Je vais voir ce que je peux faire !!" }
+        ];
+        let currentLine = 0;
+
+        function goToSchool() {
+            const nameInput = document.getElementById('player-name').value;
+            const schoolInput = document.getElementById('school-name').value;
+            if(nameInput) playerData.name = nameInput;
+            if(schoolInput) playerData.school = schoolInput;
+            document.getElementById('display-school-name').textContent = playerData.school;
+            document.getElementById('narrative-player-name').textContent = playerData.name;
+            document.getElementById('narrative-school-name').textContent = playerData.school;
+            switchSlide('slide-intro', 'slide-school');
+        }
+
+        function startDialogue() { switchSlide('slide-school', 'slide-dialogue'); showLine(0); }
+        function nextDialogueLine() {
+            currentLine++;
+            if (currentLine < scenario.length) showLine(currentLine);
+            else switchSlide('slide-dialogue', 'slide-narrative');
+        }
+        function goToMission() { switchSlide('slide-narrative', 'slide-mission'); }
+        function showLine(index) {
+            const line = scenario[index];
+            let text = line.text.replace("{name}", playerData.name);
+            let speaker = line.speaker === "Vous" ? playerData.name : line.speaker;
+            document.getElementById('speaker-name').textContent = speaker;
+            document.getElementById('dialogue-text').textContent = text;
+        }
+        function switchSlide(currentId, nextId) {
+            document.getElementById(currentId).classList.remove('active');
+            document.getElementById(nextId).classList.add('active');
+        }
+
+        // --- LOGIQUE JEU (BARRES + CANVAS) ---
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let gameRunning = false;
+        let animationId;
+
+        // ETAT DES JAUGES (0 à 100)
+        let stats = {
+            ethique: 50,
+            autonomie: 50,
+            durabilite: 50
+        };
+
+        // MODIFICATION DU JOUEUR ICI
+        const player = { x: 400, y: 500, width: 50, height: 50, speed: 8, dx: 0, emoji: "👩‍🏫" };
+        let fallingObjects = [];
+        let spawnRate = 60;
+        let frameCount = 0;
+
+        // DEFINITION DES OBJETS ET LEUR IMPACT
+        const itemTypes = [
+            // BARRE 1 : ETHIQUE
+            // Augmente : Logiciels Libres
+            { type: 'good', emoji: '🔓', stat: 'ethique', val: 15, label: 'Libre' },
+            { type: 'good', emoji: '📄', stat: 'ethique', val: 10, label: 'Opendata' },
+            // Diminue : Cloud
+            { type: 'bad', emoji: '☁️', stat: 'ethique', val: -20, label: 'Cloud' },
+
+            // BARRE 2 : AUTONOMIE
+            // Augmente : Linux
+            { type: 'good', emoji: '🐧', stat: 'autonomie', val: 15, label: 'Linux' },
+            // Diminue : GAFAM
+            { type: 'bad', emoji: '💰', stat: 'autonomie', val: -20, label: 'GAFAM' },
+
+            // BARRE 3 : DURABILITE
+            // Augmente : Ordi Réparé
+            { type: 'good', emoji: '💻', stat: 'durabilite', val: 15, label: 'Réparé' },
+            // Diminue : Ordi Poubelle
+            { type: 'bad', emoji: '🗑️', stat: 'durabilite', val: -20, label: 'Déchet' }
+        ];
+
+        // Controles
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') player.dx = player.speed;
+            if (e.key === 'ArrowLeft') player.dx = -player.speed;
+        });
+        document.addEventListener('keyup', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') player.dx = 0;
+        });
+
+        function launchGame() {
+            document.getElementById('slide-mission').classList.remove('active');
+            document.getElementById('game-interface').style.display = 'block';
+            resetGame();
+        }
+
+        function resetGame() {
+            gameRunning = true;
+            stats = { ethique: 50, autonomie: 50, durabilite: 50 }; // Reset à 50%
+            fallingObjects = [];
+            player.x = canvas.width / 2 - player.width / 2;
+            document.getElementById('game-over-screen').style.display = 'none';
+            document.getElementById('game-win-screen').style.display = 'none';
+            spawnRate = 60;
+            updateHUD();
+            animate();
+        }
+
+        function updateHUD() {
+            // Mettre à jour la largeur des barres CSS
+            document.getElementById('bar-ethique').style.width = stats.ethique + '%';
+            document.getElementById('bar-autonomie').style.width = stats.autonomie + '%';
+            document.getElementById('bar-durabilite').style.width = stats.durabilite + '%';
+        }
+
+        function endGame(won, reason = "") {
+            gameRunning = false;
+            cancelAnimationFrame(animationId);
+            if (won) {
+                document.getElementById('game-win-screen').style.display = 'flex';
+            } else {
+                document.getElementById('lose-reason').innerHTML = reason;
+                document.getElementById('game-over-screen').style.display = 'flex';
+            }
+        }
+
+        function spawnObject() {
+            const randomType = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+            fallingObjects.push({
+                x: Math.random() * (canvas.width - 40),
+                y: -40,
+                speed: 3 + Math.random() * 3,
+                ...randomType
+            });
+        }
+
+        function animate() {
+            if (!gameRunning) return;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Joueur
+            player.x += player.dx;
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+            ctx.font = "40px Arial";
+            ctx.fillText(player.emoji, player.x, player.y + 40);
+
+            // Objets
+            frameCount++;
+            if (frameCount % spawnRate === 0) {
+                spawnObject();
+                if(spawnRate > 25) spawnRate--; 
+            }
+
+            for (let i = 0; i < fallingObjects.length; i++) {
+                let obj = fallingObjects[i];
+                obj.y += obj.speed;
+
+                ctx.font = "30px Arial";
+                ctx.fillText(obj.emoji, obj.x, obj.y + 30);
+
+                // Collision
+                if (
+                    obj.x < player.x + player.width &&
+                    obj.x + 30 > player.x &&
+                    obj.y < player.y + player.height &&
+                    obj.y + 30 > player.y
+                ) {
+                    // Impact sur la stat concernée
+                    stats[obj.stat] += obj.val;
+                    
+                    // Limites (Clamp) entre 0 et 100
+                    if (stats[obj.stat] > 100) stats[obj.stat] = 100;
+                    if (stats[obj.stat] < 0) stats[obj.stat] = 0;
+
+                    fallingObjects.splice(i, 1);
+                    i--;
+                    updateHUD();
+
+                    // Vérification Défaite (Si UNE barre tombe à 0)
+                    if (stats.ethique <= 0) { endGame(false, "Votre établissement manque d'<strong>Éthique</strong>.<br>Attention aux données personnelles !"); return; }
+                    if (stats.autonomie <= 0) { endGame(false, "Vous avez perdu votre <strong>Autonomie</strong>.<br>Vous êtes dépendant des GAFAM."); return; }
+                    if (stats.durabilite <= 0) { endGame(false, "Votre score de <strong>Durabilité</strong> est nul.<br>L'obsolescence a envahi l'école."); return; }
+
+                    // Vérification Victoire (Si TOUTES les barres sont à 100)
+                    if (stats.ethique >= 100 && stats.autonomie >= 100 && stats.durabilite >= 100) {
+                        endGame(true);
+                        return;
+                    }
+
+                    continue;
+                }
+
+                if (obj.y > canvas.height) {
+                    fallingObjects.splice(i, 1);
+                    i--;
+                }
+            }
+
+            animationId = requestAnimationFrame(animate);
+        }
+    </script>
+
+</body>
+</html>
